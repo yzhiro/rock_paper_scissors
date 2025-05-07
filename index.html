@@ -24,16 +24,15 @@
 
   <div id="result" class="text-xl mb-4 text-orange-500 font-semibold" data-aos="fade-in"></div>
   <div class="mb-2 text-yellow-600">スコア: <span id="score">0</span> 点 / 回数: <span id="rounds">0</span> / 10</div>
-  <div class="mb-4 text-yellow-600">ベスト5スコア: <span id="bestScores">-</span></div>
+  <div class="mb-2 text-yellow-600">ベスト5スコア: <span id="bestScores">-</span></div>
+  <div class="mb-4 text-yellow-600">ワースト5スコア: <span id="worstScores">-</span></div>
 
-  <!-- リセットボタン -->
   <div class="mt-4 mb-8" data-aos="flip-left">
     <button onclick="resetGame()" class="px-6 py-3 bg-white text-black font-bold border border-gray-400 rounded hover:bg-gray-200 shadow-md">
       🔄 リセット
     </button>
   </div>
 
-  <!-- サウンド -->
   <audio id="winSound" src="assets/sounds/win.mp3" preload="auto"></audio>
   <audio id="loseSound" src="assets/sounds/lose.mp3" preload="auto"></audio>
   <audio id="drawSound" src="assets/sounds/draw.mp3" preload="auto"></audio>
@@ -102,6 +101,7 @@
 
       if (rounds === 10) {
         saveBestScore(score);
+        saveWorstScore(score);
         disableButtons();
         document.getElementById("result").innerHTML += "<br><strong class='text-red-300'>ゲーム終了！</strong>";
       } else {
@@ -116,6 +116,7 @@
       document.getElementById("score").textContent = score;
       document.getElementById("rounds").textContent = rounds;
       updateBestScores();
+      updateWorstScores();
     }
 
     function saveBestScore(current) {
@@ -124,11 +125,26 @@
       scores.sort((a, b) => b - a);
       scores = scores.slice(0, 5);
       localStorage.setItem("bestScores", JSON.stringify(scores));
+      updateBestScores();
     }
 
     function updateBestScores() {
       let scores = JSON.parse(localStorage.getItem("bestScores")) || [];
       document.getElementById("bestScores").textContent = scores.join(", ");
+    }
+
+    function saveWorstScore(current) {
+      let scores = JSON.parse(localStorage.getItem("worstScores")) || [];
+      scores.push(current);
+      scores.sort((a, b) => a - b);
+      scores = scores.slice(0, 5);
+      localStorage.setItem("worstScores", JSON.stringify(scores));
+      updateWorstScores();
+    }
+
+    function updateWorstScores() {
+      let scores = JSON.parse(localStorage.getItem("worstScores")) || [];
+      document.getElementById("worstScores").textContent = scores.join(", ");
     }
 
     function disableButtons() {
@@ -146,6 +162,7 @@
     }
 
     updateBestScores();
+    updateWorstScores();
     startAnimation();
   </script>
 </body>
